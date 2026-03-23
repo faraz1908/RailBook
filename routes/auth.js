@@ -7,7 +7,13 @@ const router = express.Router();
 
 router.get('/google' ,passport.authenticate('google',{scope:['profile' , 'email']}));
 
-res.redirect('https://railbook-frontend.vercel.app/dashboard');
+router.get('/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  (req, res) => {
+    // ✅ YE SAHI HAI (Function ke andar res mil raha hai)
+    res.redirect('https://railbook-frontend.vercel.app/dashboard');
+  }
+);
 
 router.get('/logout' ,(req,res)=>{
     req.logOut(()=>{
