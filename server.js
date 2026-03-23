@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const cors = require('cors');
 const session = require('express-session');
-const MongoStore = require('connect-mongo'); // 🔥 ADD THIS
 require('dotenv').config();
 
 const app = express();
@@ -17,21 +16,15 @@ app.use(cors({
 
 app.use(express.json());
 
-// ✅ 2. TRUST PROXY (Render ke liye zaroori)
+// ✅ 2. TRUST PROXY (important for Render)
 app.set("trust proxy", 1);
 
-// ✅ 3. SESSION (🔥 FIXED WITH MONGODB STORE)
+// ✅ 3. SESSION FIX
 app.use(session({
   secret: process.env.SESSION_SECRET || 'railway_secret_123',
-  resave: false,
+  resave: false,              // ❗ FIXED
   saveUninitialized: false,
   proxy: true,
-
-  store: MongoStore.create({   // 🔥 MAIN FIX
-    mongoUrl: process.env.MONGO_URI,
-    collectionName: "sessions"
-  }),
-
   cookie: { 
     secure: true,
     sameSite: "none",
@@ -55,13 +48,11 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch(err => console.log("❌ DB Error:", err));
 
-// ✅ TEST ROUTE
+// ✅ TEST
 app.get('/', (req, res) => {
   res.send("Railway API running...");
 });
 
-// ✅ SERVER START
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server started on port ${PORT}`);
+app.listen(process.env.PORT || 5000, () => {
+  console.log("🚀 Server started");
 });

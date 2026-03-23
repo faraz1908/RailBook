@@ -2,40 +2,28 @@ const express = require('express');
 const passport = require('passport');
 const router = express.Router();
 
-// ✅ Google Login
-router.get('/google', 
-  passport.authenticate('google', { scope: ['profile', 'email'] })
-);
+const FRONTEND_URL = "https://railbook-frontend.vercel.app";
 
-// ✅ Callback
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
 router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login' }),
+  passport.authenticate('google', { failureRedirect: `${FRONTEND_URL}/login` }),
   (req, res) => {
-    // 🔥 FIX: direct frontend pe bhej
-    res.redirect('https://railbook-frontend.vercel.app');
+    res.redirect(FRONTEND_URL);
   }
 );
 
-// ✅ Logout FIX
 router.get('/logout', (req, res) => {
   req.logout(() => {
-    res.redirect('https://railbook-frontend.vercel.app'); // ❗ FIXED
+    res.redirect(FRONTEND_URL);
   });
 });
 
-// ✅ Login Success
 router.get('/login/success', (req, res) => {
   if (req.user) {
-    res.status(200).json({
-      success: true,
-      message: "User authenticated",
-      user: req.user,
-    });
+    res.status(200).json({ success: true, user: req.user });
   } else {
-    res.status(403).json({
-      success: false,
-      message: "Not Authorized"
-    });
+    res.status(403).json({ success: false, message: "Not Authorized" });
   }
 });
 

@@ -1,4 +1,4 @@
-const Train = require('../Models/Train');
+const Train = require('../models/Train');
 
 exports.addTrain = async(req,res)=>{
     try{
