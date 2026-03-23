@@ -7,7 +7,7 @@ require('dotenv').config();
 
 const app = express();
 
-// ✅ 1. CORS
+// ✅ 1. CORS Setup
 app.use(cors({
   origin: "https://railbook-frontend.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -16,23 +16,23 @@ app.use(cors({
 
 app.use(express.json());
 
-// ✅ 2. TRUST PROXY (important for Render)
+// ✅ 2. Proxy Trust (Render ke liye TOP par)
 app.set("trust proxy", 1);
 
-// ✅ 3. SESSION FIX
+// ✅ 3. Session Config
 app.use(session({
-  secret: 'railway_secret_123',
-  resave: false,
+  secret: process.env.SESSION_SECRET || 'railway_secret_123',
+  resave: true, 
   saveUninitialized: false,
-  proxy: true, // Render ke liye zaroori
+  proxy: true,
   cookie: { 
-    secure: true,      // HTTPS hai isliye true
-    sameSite: 'none',  // Cross-site cookies ke liye 'none' 100% zaroori hai
+    secure: true,      // HTTPS compulsory
+    sameSite: 'none',  // Cross-domain cookies
     maxAge: 24 * 60 * 60 * 1000 
   }
 }));
 
-// ✅ 4. Passport
+// ✅ 4. Passport Initialize
 app.use(passport.initialize());
 app.use(passport.session());
 require('./config/passport')(passport);
@@ -42,16 +42,16 @@ app.use('/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/booking', require('./routes/bookingRoutes'));
 
-// ✅ 6. MongoDB
+// ✅ 6. MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch(err => console.log("❌ DB Error:", err));
 
-// ✅ TEST
 app.get('/', (req, res) => {
   res.send("Railway API running...");
 });
 
-app.listen(process.env.PORT || 5000, () => {
-  console.log("🚀 Server started");
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server started on port ${PORT}`);
 });
