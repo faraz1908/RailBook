@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Train = require('../Models/Train');
+const Train = require('../models/Train');
 
 
 router.get('/search', async (req, res) => {
