@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const Train = require('../models/Train');
-const User = require('../models/User');
-const Booking = require('../models/Booking');
+const Train = require('./Train');
+const User = require('./User');
+const Booking = require('./Booking');
 
 // A. DASHBOARD STATS
 router.get('/stats', async (req, res) => {

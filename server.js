@@ -5,7 +5,7 @@ const cors = require('cors');
 const session = require('express-session');
 require('dotenv').config();
 
-const user = require('./models/User');
+const user = require('/User');
 
 const MONGO_URI = process.env.MONGO_URI;
 const app = express(); 
