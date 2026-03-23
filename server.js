@@ -21,15 +21,14 @@ app.set("trust proxy", 1);
 
 // ✅ 3. SESSION FIX
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'railway_secret_123',
-  resave: false,              // ❗ FIXED
+  secret: 'railway_secret_123',
+  resave: false,
   saveUninitialized: false,
-  proxy: true,
+  proxy: true, // Render ke liye zaroori
   cookie: { 
-    secure: true,
-    sameSite: "none",
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000
+    secure: true,      // HTTPS hai isliye true
+    sameSite: 'none',  // Cross-site cookies ke liye 'none' 100% zaroori hai
+    maxAge: 24 * 60 * 60 * 1000 
   }
 }));
 
