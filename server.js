@@ -9,13 +9,14 @@ const app = express();
 
 // 1. Middlewares
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: ["https://railbook-frontend.vercel.app", "http://localhost:3000"], // Dono allow kar diye
   methods: "GET,POST,PUT,DELETE",
   credentials: true
 }));
 app.use(express.json());
 
 // 2. Session Setup
+app.set("trust proxy", 1); // Render ko trust karne ke liye
 app.use(session({
   secret: 'railway_secret_123',
   resave: false,
