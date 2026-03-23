@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Train = require('../models/Train');
 const User = require('../models/User');
-const Booking = require('../Models/Booking');
+const Booking = require('../models/Booking');
 
 // A. DASHBOARD STATS
 router.get('/stats', async (req, res) => {
