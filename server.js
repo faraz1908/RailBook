@@ -16,13 +16,15 @@ app.use(cors({
 app.use(express.json());
 
 // 2. Session Setup
-app.set("trust proxy", 1); // Render ko trust karne ke liye
+app.set("trust proxy", 1); // Render/Vercel ke liye 100% zaroori hai
 app.use(session({
   secret: 'railway_secret_123',
   resave: false,
   saveUninitialized: false,
+  proxy: true, // Ye bhi add kar do
   cookie: { 
-    secure: false, 
+    secure: true, // HTTPS ke liye true hona chahiye (Render/Vercel dono HTTPS hain)
+    sameSite: 'none', // Ye sabse important hai cross-site cookies ke liye
     maxAge: 24 * 60 * 60 * 1000 
   }
 }));
