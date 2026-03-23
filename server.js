@@ -3,58 +3,64 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const cors = require('cors');
 const session = require('express-session');
+const MongoStore = require('connect-mongo'); // 🔥 ADD THIS
 require('dotenv').config();
 
-const app = express(); 
+const app = express();
 
-// 1. Middlewares
+// ✅ 1. CORS
 app.use(cors({
-  origin: ["https://railbook-frontend.vercel.app", "http://localhost:3000"], // Dono allow kar diye
-  methods: "GET,POST,PUT,DELETE",
+  origin: "https://railbook-frontend.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
+
 app.use(express.json());
 
-// 2. Session Setup
-app.set("trust proxy", 1); // Render/Vercel ke liye 100% zaroori hai
+// ✅ 2. TRUST PROXY (Render ke liye zaroori)
+app.set("trust proxy", 1);
+
+// ✅ 3. SESSION (🔥 FIXED WITH MONGODB STORE)
 app.use(session({
-  secret: 'railway_secret_123',
+  secret: process.env.SESSION_SECRET || 'railway_secret_123',
   resave: false,
   saveUninitialized: false,
-  proxy: true, // Ye bhi add kar do
+  proxy: true,
+
+  store: MongoStore.create({   // 🔥 MAIN FIX
+    mongoUrl: process.env.MONGO_URI,
+    collectionName: "sessions"
+  }),
+
   cookie: { 
-    secure: true, // HTTPS ke liye true hona chahiye (Render/Vercel dono HTTPS hain)
-    sameSite: 'none', // Ye sabse important hai cross-site cookies ke liye
-    maxAge: 24 * 60 * 60 * 1000 
+    secure: true,
+    sameSite: "none",
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000
   }
 }));
 
-// 3. Passport Setup
+// ✅ 4. Passport
 app.use(passport.initialize());
 app.use(passport.session());
 require('./config/passport')(passport);
 
-// 4. Routes Import
-const authRoutes = require('./routes/auth');
-const adminRoutes = require('./routes/adminRoutes');
-const bookingRoutes = require('./routes/bookingRoutes');
+// ✅ 5. Routes
+app.use('/auth', require('./routes/auth'));
+app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/booking', require('./routes/bookingRoutes'));
 
-// 5. API Endpoints
-app.use('/auth', authRoutes);
-app.use('/api/admin', adminRoutes); 
-app.use('/api/booking', bookingRoutes);
+// ✅ 6. MongoDB
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch(err => console.log("❌ DB Error:", err));
 
-// 6. MongoDB Connection
-const MONGO_URI = process.env.MONGO_URI;
-mongoose.connect(MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected Successfully!"))
-  .catch((err) => console.log("❌ MongoDB Connection Error:", err));
-
-// Test Route
+// ✅ TEST ROUTE
 app.get('/', (req, res) => {
-  res.send("Railway API is running...");
+  res.send("Railway API running...");
 });
 
+// ✅ SERVER START
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server started on port ${PORT}`);

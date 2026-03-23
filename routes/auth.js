@@ -2,35 +2,41 @@ const express = require('express');
 const passport = require('passport');
 const router = express.Router();
 
-//@desc Auth with google
-//@route GET /api/auth/google
+// ✅ Google Login
+router.get('/google', 
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
 
-router.get('/google' ,passport.authenticate('google',{scope:['profile' , 'email']}));
-
-router.get('/google/callback', 
+// ✅ Callback
+router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    // ✅ YE SAHI HAI (Function ke andar res mil raha hai)
-    res.redirect('https://railbook-frontend.vercel.app/dashboard');
+    // 🔥 FIX: direct frontend pe bhej
+    res.redirect('https://railbook-frontend.vercel.app');
   }
 );
 
-router.get('/logout' ,(req,res)=>{
-    req.logOut(()=>{
-        res.redirect('http://localhost:3000');
-    });
+// ✅ Logout FIX
+router.get('/logout', (req, res) => {
+  req.logout(() => {
+    res.redirect('https://railbook-frontend.vercel.app'); // ❗ FIXED
+  });
 });
 
-router.get('/login/success' ,(req,res)=>{
-    if(req.user){
-        res.status(200).json({
-            success:true,
-            message: "user has successfully authenticated",
-            user:req.user,
-        });
-    }else{
-        res.status(403).json({success:false , message:"Not Authorized"});
-    }
+// ✅ Login Success
+router.get('/login/success', (req, res) => {
+  if (req.user) {
+    res.status(200).json({
+      success: true,
+      message: "User authenticated",
+      user: req.user,
+    });
+  } else {
+    res.status(403).json({
+      success: false,
+      message: "Not Authorized"
+    });
+  }
 });
 
 module.exports = router;
