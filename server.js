@@ -5,10 +5,8 @@ const cors = require('cors');
 const session = require('express-session');
 require('dotenv').config();
 
-const user = require('/User');
-
-const MONGO_URI = process.env.MONGO_URI;
 const app = express(); 
+
 // 1. Middlewares
 app.use(cors({
   origin: "http://localhost:3000",
@@ -33,18 +31,21 @@ app.use(passport.initialize());
 app.use(passport.session());
 require('./config/passport')(passport);
 
-
-const adminRoutes = require('./routes/adminRoutes');
+// 4. Routes Import
 const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/adminRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
+
+// 5. API Endpoints
 app.use('/auth', authRoutes);
 app.use('/api/admin', adminRoutes); 
-app.use('/api/booking' , bookingRoutes);
+app.use('/api/booking', bookingRoutes);
 
-// MongoDB Connection
+// 6. MongoDB Connection
+const MONGO_URI = process.env.MONGO_URI;
 mongoose.connect(MONGO_URI)
-  .then(() => console.log("MongoDB Connected Successfully!"))
-  .catch((err) => console.log(" MongoDB Connection Error:", err));
+  .then(() => console.log("✅ MongoDB Connected Successfully!"))
+  .catch((err) => console.log("❌ MongoDB Connection Error:", err));
 
 // Test Route
 app.get('/', (req, res) => {

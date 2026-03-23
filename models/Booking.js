@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const bookingSchema = new mongoose.Schema({
-  // Yahan galti thi: mongoose.Schema.Types.ObjectId hona chahiye
   trainId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Train', 
@@ -32,4 +31,5 @@ const bookingSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Booking', bookingSchema);
+// Safety check to prevent OverwriteModelError
+module.exports = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
